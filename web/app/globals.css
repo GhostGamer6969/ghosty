@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import './styles/animations.css';
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,956 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+html {
+  cursor: none;
+}
+
+/* Add cursor back for touch devices */
+@media (hover: none) {
+  html {
+    cursor: auto;
+  }
+  
+  .magnifying-cursor {
+    display: none;
+  }
+}
+
+/* Add hover states for interactive elements */
+a, button, input, textarea {
+  cursor: none;
+}
+
+* {
+  cursor: none;
+}
+
+/* Add scale effect for text elements */
+p, h1, h2, h3, h4, h5, h6, span, button {
+  transition: transform 0.2s ease-out;
+}
+
+p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, span:hover, button:hover {
+  transform: scale(1.02);
+}
+
+
+@keyframes scrollArrow {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+
+.animated-text-stroke {
+  -webkit-text-stroke: 1.5px white;
+  text-stroke: 1.5px white; /* for some browsers */
+  position: relative;
+  user-select: none;
+}
+
+.animated-triangle {
+  position: absolute;
+  top: 50%;
+  left: -3rem;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 3rem;
+  background: white;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  opacity: 0.8;
+  animation: triangle-slide 2s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px white);
+  z-index: 10;
+}
+
+@keyframes triangle-slide {
+  0% {
+    left: -13rem;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes arrowSlide {
+  0% {
+    transform: translateX(-80px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(680px);
+    opacity: 0;
+  }
+}
+
+/* === SwapTypeformCard Pop UI === */
+.swap-bg {
+  background: radial-gradient(ellipse 80% 90% at 60% 66%, #27191f 0%, #18191b 85%, #080A14 100%);
+  overflow: hidden;
+  min-height: 100vh;
+}
+.paycard-outer {
+  min-height: 85vh;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.paycard-bg {
+  width: 368px;
+  height: 225px;
+  background: linear-gradient(135deg, #374151 6%, #1a1c1e 90%);
+  border-radius: 24px;
+  border: 2.5px solid #22282F40;
+  box-shadow: 0 0 72px -16px #ff6b6b50, 0 0 0 1px #2d258255;
+  position: absolute;
+}
+.paycard-glow {
+  box-shadow: 0 0 56px 0 #ff6b6b7e, 0 0 0 1px #45B7D1aa;
+}
+.paycard-question-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(96deg, #ffffff 0, #ff6b6b 40%, #45B7D1 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+}
+.paycard-question-subtitle {
+  margin-top: 4px;
+  font-size: 1rem;
+  color: #e5e7ebcc;
+  text-align: center;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.paycard-label {
+  color: #fff9;
+  font-size: 0.97rem;
+  letter-spacing: 0.01em;
+}
+.paycard-value {
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  margin-left: 6px;
+  word-break: break-all;
+}
+.paycard-nav {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.56rem 1.3rem;
+  display: inline-block;
+  border-radius: 15px;
+  background: linear-gradient(90deg, #ff6b6bee 0%, #4ecdc4e6 100%);
+  color: #fff;
+  font-weight: 600;
+  outline: none;
+  border: none;
+  box-shadow: 0 6px 20px -8px #4ecdc4bb;
+  transition: filter 0.16s, background 0.22s;
+  cursor: pointer;
+}
+.paycard-next {
+  background: linear-gradient(90deg, #ff6b6bee 0%, #4ecdc4e6 100%);
+}
+.paycard-details {
+  width: 100%;
+  background: linear-gradient(80deg, #22202699 0%, #29243a91 90%);
+  border-radius: 18px;
+  border: 1.6px solid #ff6b6b34;
+  padding: 12px 18px;
+  margin-top: 4px;
+  font-size: 0.97rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paycard-directionbtn,
+.paycard-assetbtn {
+  min-width: 100px;
+  min-height: 62px;
+  padding: 10px 18px;
+  border-radius: 1.3rem;
+  font-size: 1.18rem;
+  transition: all 0.21s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  border: 2px solid #ffffff22;
+  background: linear-gradient(98deg, #26282Cdd 60%, #18191B 100%);
+  color: #fff;
+  margin: 0 2px;
+}
+.paycard-directionbtn.paycard-selected,
+.paycard-assetbtn.paycard-selected {
+  background: linear-gradient(98deg, #ff6b6b 40%, #4ecdc4 120%);
+  color: #fff;
+  border: 2px solid #fff7;
+  box-shadow: 0 0 15px #ff6b6b30;
+}
+.paycard-directionbtn.paycard-unselected,
+.paycard-assetbtn.paycard-unselected {
+  opacity: 0.90;
+  color: #ffa59b;
+  border-color: #4ecdc444;
+}
+.paycard-assetbtn.paycard-disabled {
+  opacity: 0.33;
+  cursor: not-allowed;
+  color: #ffffff70;
+}
+.paycard-input {
+  width: 85%;
+  min-width: 140px;
+  max-width: 175px;
+  padding: 9px 13px;
+  font-size: 1.22rem;
+  border-radius: 16px;
+  background: #171c24ee;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace !important;
+  border: 2px solid #ff6b6b22;
+  outline: none;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  text-align: center;
+  transition: border 0.19s;
+}
+.paycard-input:focus {
+  border: 2px solid #ff6b6b99;
+  background: #252b37ee;
+}
+
+@media (max-width: 600px) {
+  .paycard-bg,
+  .paycard-outer > div { width: 96vw !important; }
+}
+
+/* Bigger stage, smoother gradient */
+.swap-bg {
+  background: radial-gradient(ellipse 85% 95% at 60% 66%, #27191f 0%, #18191b 85%, #080A14 100%);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Stacked behind-card size now matches new main card */
+.paycard-bg {
+  width: 520px;
+  height: 320px;
+  background: linear-gradient(135deg, #374151 6%, #1a1c1e 90%);
+  border-radius: 28px;
+  border: 2px solid #22282F40;
+  box-shadow: 0 0 96px -16px #ff6b6b55, 0 0 0 1px #2d258255;
+  position: absolute;
+}
+
+/* Glow ring around active card */
+.paycard-glow {
+  box-shadow: 0 0 72px 0 #ff6b6b7e, 0 0 0 1px #45B7D1aa, inset 0 0 24px #ffffff08;
+}
+
+/* Titles enlarged and tightened */
+.paycard-question-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  background: linear-gradient(96deg, #ffffff 0, #ff6b6b 40%, #45B7D1 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.03em;
+  margin-top: 6px;
+}
+
+.paycard-question-subtitle {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  color: #e5e7ebcc;
+  text-align: center;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+/* Copy styles */
+.paycard-label { color: #fff9; font-size: 1rem; letter-spacing: 0.01em; }
+.paycard-value { color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-left: 6px; word-break: break-all; }
+
+/* Buttons enlarged + magnetic-hover feel */
+.paycard-directionbtn,
+.paycard-assetbtn {
+  min-width: 112px;
+  min-height: 70px;
+  padding: 14px 20px;
+  border-radius: 1.4rem;
+  font-size: 1.2rem;
+  transition: transform .18s ease, box-shadow .18s ease, background .22s ease, border-color .22s ease;
+  cursor: pointer;
+  border: 2px solid #ffffff22;
+  background: linear-gradient(98deg, #26282Cdd 60%, #18191B 100%);
+  color: #fff;
+  margin: 0 4px;
+}
+.paycard-directionbtn:hover,
+.paycard-assetbtn:hover { transform: translateY(-2px) scale(1.03); }
+
+.paycard-directionbtn.paycard-selected,
+.paycard-assetbtn.paycard-selected {
+  background: linear-gradient(98deg, #ff6b6b 40%, #4ecdc4 120%);
+  color: #fff;
+  border: 2px solid #fff7;
+  box-shadow: 0 10px 24px -12px #ff6b6b66;
+}
+.paycard-directionbtn.paycard-unselected,
+.paycard-assetbtn.paycard-unselected {
+  opacity: 0.95;
+  color: #ffc2bb;
+  border-color: #4ecdc444;
+}
+.paycard-assetbtn.paycard-disabled {
+  opacity: 0.33;
+  cursor: not-allowed;
+  color: #ffffff70;
+}
+
+/* Larger input with neon focus */
+.paycard-input {
+  width: 70%;
+  min-width: 200px;
+  max-width: 320px;
+  padding: 12px 16px;
+  font-size: 1.28rem;
+  border-radius: 16px;
+  background: #171c24ee;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace !important;
+  border: 2px solid #ff6b6b22;
+  outline: none;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  text-align: center;
+  transition: border .19s, box-shadow .19s, background .19s;
+}
+.paycard-input:hover { border-color: #ff6b6b66; }
+.paycard-input:focus {
+  border: 2px solid #ff6b6b99;
+  background: #252b37ee;
+  box-shadow: 0 0 0 6px #ff6b6b1a, 0 10px 26px -12px #4ecdc455;
+}
+
+/* Detail box */
+.paycard-details {
+  width: 100%;
+  background: linear-gradient(80deg, #22202699 0%, #29243a91 90%);
+  border-radius: 18px;
+  border: 1.6px solid #ff6b6b34;
+  padding: 40px 80px;
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Navigation buttons + progress */
+.paycard-nav {
+  font-family: inherit;
+  font-size: 1.02rem;
+  padding: 0.68rem 1.45rem;
+  display: inline-block;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #ff6b6bee 0%, #4ecdc4e6 100%);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 10px 28px -12px #4ecdc4bb;
+  transition: transform .16s ease, filter .16s ease, box-shadow .18s ease;
+  cursor: pointer;
+}
+.paycard-nav:hover { filter: brightness(1.05); transform: translateY(-2px) scale(1.04); }
+.paycard-next { background: linear-gradient(90deg, #ff6b6bee 0%, #4ecdc4e6 100%); }
+
+.progress-track { background: #232930; box-shadow: inset 0 0 0 1px #ffffff18; }
+.progress-bar {
+  background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+  background-size: 200% 100%;
+  animation: progressSheen 3s linear infinite;
+}
+@keyframes progressSheen {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Moving specular highlight on the card */
+.paycard-shine {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: radial-gradient(220px circle at var(--sx) var(--sy), rgba(255,255,255,0.18), rgba(255,255,255,0.06) 28%, transparent 60%);
+  mix-blend-mode: screen;
+}
+
+/* Cursor and spotlight that follow mouse */
+/* .cursor-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #ffe0e0);
+  box-shadow: 0 0 10px #fff9;
+  transform: translate3d(0,0,0);
+} */
+/* .cursor-glow {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  filter: blur(22px);
+  background: radial-gradient(circle at 50% 50%, rgba(255,107,107,0.48), rgba(78,205,196,0.38), transparent 70%);
+  mix-blend-mode: screen;
+  transform: translate3d(0,0,0);
+}
+.spotlight {
+  background:
+    radial-gradient(600px circle at var(--x) var(--y),
+      rgba(255,107,107,0.18),
+      rgba(78,205,196,0.12) 40%,
+      transparent 60%);
+  mix-blend-mode: screen;
+} */
+
+/* Touch devices: hide custom cursor */
+@media (hover: none) {
+  .cursor-dot, .cursor-glow, .spotlight { display: none; }
+}
+
+/* Responsive fallback for narrow screens */
+@media (max-width: 720px) {
+  .paycard-bg,
+  .paycard-outer > div { width: 96vw !important; height: auto; }
+}
+
+/* Spotlight with smaller radius and softer opacity */
+/* .spotlight {
+  background:
+    radial-gradient(360px circle at var(--x) var(--y),
+      rgba(255,107,107,0.14),
+      rgba(78,205,196,0.10) 40%,
+      transparent 60%);
+  mix-blend-mode: screen;
+} */
+
+/* Single glow that follows cursor (reduced size); removed .cursor-dot usage */
+/* .cursor-glow {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  filter: blur(16px);
+  background: radial-gradient(circle at 50% 50%, rgba(255,107,107,0.36), rgba(78,205,196,0.28), transparent 70%);
+  mix-blend-mode: screen;
+  transform: translate3d(0,0,0);
+} */
+
+/* Remove dot completely if class exists elsewhere */
+/* .cursor-dot { display: none !important; } */
+
+/* Existing moving specular highlight stays */
+.paycard-shine {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: radial-gradient(180px circle at var(--sx) var(--sy), rgba(255,255,255,0.16), rgba(255,255,255,0.06) 28%, transparent 60%);
+  mix-blend-mode: screen;
+}
+
+/* NEW: Diagonal shiny sweep line that travels corner-to-corner */
+.paycard-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  /* ultra-thin band for a 'line' feel */
+  width: 220%;
+  height: 220%;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.65) 50%,
+      rgba(255,255,255,0) 100%);
+  /* start outside top-left, rotate to diagonal */
+  transform: translate(-120%, -120%) rotate(45deg);
+  opacity: 0.0;
+  animation: paycard-sweep 5.5s linear infinite;
+}
+
+/* Periodic sweep with small dwell time off-screen for interval feel */
+@keyframes paycard-sweep {
+  0%   { transform: translate(-120%, -120%) rotate(45deg); opacity: 0; }
+  6%   { opacity: 0.55; }
+  26%  { opacity: 0.85; }
+  46%  { opacity: 0.55; }
+  52%  { opacity: 0; }
+  54%  { transform: translate(200%, 200%) rotate(45deg); opacity: 0; }
+  100% { transform: translate(200%, 200%) rotate(45deg); opacity: 0; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .paycard-sweep { animation: none; opacity: 0; }
+  .progress-bar { animation: none; }
+}
+
+/* Touch devices: hide custom cursor pieces */
+@media (hover: none) {
+  .cursor-glow, .spotlight { display: none; }
+}
+
+/* Replace your existing .paycard-sweep and keyframes with variable-driven versions */
+.paycard-sweep {
+  --sweep-angle: 135deg;            /* line angle */
+  --sweep-duration: 20s;          /* full cycle time */
+  --sweep-delay: 1s;               /* delay between cycles */
+  --sweep-peak: 0.4;              /* max opacity of the line */
+  --sweep-size: 240%;              /* size of the sweeping plane */
+  --sweep-color: rgba(255,255,255,0.45); /* line color/intensity */
+  --sweep-from-x: -130%;           /* start X translate */
+  --sweep-from-y: -130%;           /* start Y translate */
+  --sweep-to-x: 200%;              /* end X translate */
+  --sweep-to-y: 200%;              /* end Y translate */
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  width: var(--sweep-size);
+  height: var(--sweep-size);
+  background: linear-gradient(180deg, transparent 0%, var(--sweep-color) 50%, transparent 100%);
+  transform: translate(var(--sweep-from-x), var(--sweep-from-y)) rotate(var(--sweep-angle));
+  opacity: 0;
+  animation: paycard-sweep-vars var(--sweep-duration) var(--sweep-delay) linear infinite;
+}
+
+@keyframes paycard-sweep-vars {
+  0%   { transform: translate(var(--sweep-from-x), var(--sweep-from-y)) rotate(var(--sweep-angle)); opacity: 0; }
+  6%   { opacity: calc(var(--sweep-peak) * .65); }
+  24%  { opacity: var(--sweep-peak); }
+  40%  { opacity: calc(var(--sweep-peak) * .6); }
+  50%  { opacity: 0; }
+  52%  { transform: translate(var(--sweep-to-x), var(--sweep-to-y)) rotate(var(--sweep-angle)); opacity: 0; }
+  100% { transform: translate(var(--sweep-to-x), var(--sweep-to-y)) rotate(var(--sweep-angle)); opacity: 0; }
+}
+
+/* Optional: run only on hover */
+.paycard-sweep.paused { animation-play-state: paused; } 
+/* .card:hover .paycard-sweep { animation-play-state: running; } */
+
+@import "tailwindcss";
+@import './styles/animations.css';
+
+/* Premium Monochrome Glass Theme */
+:root {
+  --background: #0a0b0e;            /* deep onyx */
+  --foreground: #e8ebf2;            /* soft platinum */
+  --ink-muted: #a3aab9;             /* muted copy */
+  --ink-dimmer: #8d94a6;
+
+  --panel-0: #0f1116;               /* base panel */
+  --panel-1: #141821;               /* elevated panel */
+  --panel-2: #0b0d12;               /* backdrop */
+
+  --stroke-weak: rgba(255,255,255,0.07);
+  --stroke: rgba(255,255,255,0.12);
+  --stroke-strong: rgba(255,255,255,0.18);
+
+  --glare-0: rgba(255,255,255,0.06);
+  --glare-1: rgba(255,255,255,0.10);
+  --glare-2: rgba(255,255,255,0.16);
+
+  --accent-ice: #9fb7ff;            /* subtle ice blue accent */
+  --accent-ice-20: rgba(159,183,255,0.20);
+  --accent-ice-35: rgba(159,183,255,0.35);
+  --accent-iris: #cfd9ff;           /* pale iridescent silver */
+
+  --progress-a: rgba(214,222,244,0.9);
+  --progress-b: rgba(140,166,232,0.9);
+
+  --sheen: rgba(255,255,255,0.45);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-space-grotesk);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0b0e;
+    --foreground: #e8ebf2;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+html { cursor: none; }
+@media (hover: none) {
+  html { cursor: auto; }
+  .magnifying-cursor { display: none; }
+}
+
+a, button, input, textarea { cursor: none; }
+* { cursor: none; }
+
+/* subtle micro-interaction */
+p, h1, h2, h3, h4, h5, h6, span, button { transition: transform 0.2s ease-out; }
+p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, span:hover, button:hover { transform: scale(1.02); }
+
+/* ============ Premium Swap Card Theme ============ */
+
+/* Bigger stage with graphite vignette */
+.swap-bg {
+  background:
+    radial-gradient(ellipse 85% 95% at 60% 66%, #171a22 0%, #0f1116 55%, #0a0b0e 100%),
+    radial-gradient(90% 120% at 40% -20%, rgba(255,255,255,0.04), transparent 70%);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* shadowed stacked back-cards sized to main card (unchanged size) */
+.paycard-bg {
+  width: 520px;
+  height: 320px;
+  background: linear-gradient(135deg, #1b1f28 6%, #0f1218 90%);
+  border-radius: 28px;
+  border: 2px solid var(--stroke);
+  box-shadow:
+    0 0 96px -20px rgba(255,255,255,0.10),
+    0 0 0 1px rgba(160,180,255,0.14);
+  position: absolute;
+}
+
+/* Glow ring around active card, softened and neutral */
+.paycard-glow {
+  box-shadow:
+    0 0 72px 0 rgba(255,255,255,0.14),
+    0 0 0 1px var(--accent-ice-20),
+    inset 0 0 24px rgba(255,255,255,0.05);
+}
+
+/* Titles with silver-to-ice sheen */
+.paycard-question-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  background: linear-gradient(96deg, #ffffff 0, var(--accent-iris) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.03em;
+  margin-top: 6px;
+}
+
+.paycard-question-subtitle {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  color: rgba(232,235,242,0.7);
+  text-align: center;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.paycard-label { color: rgba(232,235,242,0.85); font-size: 1rem; letter-spacing: 0.01em; }
+.paycard-value { color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-left: 6px; word-break: break-all; }
+
+/* Direction / Asset buttons */
+.paycard-directionbtn,
+.paycard-assetbtn {
+  min-width: 112px;
+  min-height: 70px;
+  padding: 14px 20px;
+  border-radius: 1.4rem;
+  font-size: 1.2rem;
+  transition: transform .18s ease, box-shadow .18s ease, background .22s ease, border-color .22s ease, color .22s ease;
+  cursor: pointer;
+  border: 2px solid var(--stroke-weak);
+  background: linear-gradient(98deg, rgba(255,255,255,0.06) 20%, rgba(10,11,14,0.9) 100%);
+  color: #e6e9f2;
+  margin: 0 4px;
+  backdrop-filter: blur(6px);
+}
+.paycard-directionbtn:hover,
+.paycard-assetbtn:hover { transform: translateY(-2px) scale(1.03); }
+
+.paycard-directionbtn.paycard-selected,
+.paycard-assetbtn.paycard-selected {
+  background: linear-gradient(98deg, rgba(255,255,255,0.18) 0%, rgba(159,183,255,0.14) 100%);
+  color: #ffffff;
+  border: 2px solid var(--stroke-strong);
+  box-shadow: 0 10px 24px -12px rgba(159,183,255,0.25), inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+.paycard-directionbtn.paycard-unselected,
+.paycard-assetbtn.paycard-unselected {
+  opacity: 0.95;
+  color: #cdd3e0;
+  border-color: var(--stroke-weak);
+}
+.paycard-assetbtn.paycard-disabled {
+  opacity: 0.33;
+  cursor: not-allowed;
+  color: rgba(255,255,255,0.45);
+}
+
+/* Larger input with ice-blue focus */
+.paycard-input {
+  width: 70%;
+  min-width: 200px;
+  max-width: 320px;
+  padding: 12px 16px;
+  font-size: 1.28rem;
+  border-radius: 16px;
+  background: rgba(15,18,24,0.94);
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace !important;
+  border: 2px solid rgba(255,255,255,0.12);
+  outline: none;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  text-align: center;
+  transition: border .19s, box-shadow .19s, background .19s;
+  backdrop-filter: blur(6px);
+}
+.paycard-input:hover { border-color: rgba(255,255,255,0.24); }
+.paycard-input:focus {
+  border: 2px solid var(--accent-ice-35);
+  background: rgba(26,30,39,0.95);
+  box-shadow: 0 0 0 6px rgba(159,183,255,0.08), 0 10px 26px -12px rgba(159,183,255,0.24);
+}
+
+/* Detail box */
+.paycard-details {
+  width: 100%;
+  background: linear-gradient(80deg, rgba(24,26,33,0.72) 0%, rgba(18,20,28,0.78) 90%);
+  border-radius: 18px;
+  border: 1.6px solid rgba(255,255,255,0.12);
+  padding: 40px 80px;
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  backdrop-filter: blur(8px);
+}
+
+/* Navigation buttons + progress */
+.paycard-nav {
+  font-family: inherit;
+  font-size: 1.02rem;
+  padding: 0.68rem 1.45rem;
+  display: inline-block;
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.20) 0%, rgba(159,183,255,0.30) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 10px 28px -12px rgba(159,183,255,0.32);
+  transition: transform .16s ease, filter .16s ease, box-shadow .18s ease;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.paycard-nav:hover { filter: brightness(1.05); transform: translateY(-2px) scale(1.04); }
+.paycard-next { background: linear-gradient(90deg, rgba(255,255,255,0.24) 0%, rgba(159,183,255,0.36) 100%); }
+
+.progress-track { background: #1a1e26; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10); }
+.progress-bar {
+  background: linear-gradient(90deg, var(--progress-a), var(--progress-b));
+  background-size: 200% 100%;
+  animation: progressSheen 3s linear infinite;
+}
+@keyframes progressSheen {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Moving specular highlight on the card */
+.paycard-shine {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: radial-gradient(180px circle at var(--sx) var(--sy), rgba(255,255,255,0.16), rgba(255,255,255,0.06) 28%, transparent 60%);
+  mix-blend-mode: screen;
+}
+
+/* Shiny diagonal sweep with toned-down line */
+.paycard-sweep {
+  --sweep-angle: 135deg;
+  --sweep-duration: 20s;
+  --sweep-delay: 1s;
+  --sweep-peak: 0.35;
+  --sweep-size: 240%;
+  --sweep-color: var(--sheen);
+  --sweep-from-x: -130%;
+  --sweep-from-y: -130%;
+  --sweep-to-x: 200%;
+  --sweep-to-y: 200%;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  width: var(--sweep-size);
+  height: var(--sweep-size);
+  background: linear-gradient(180deg, transparent 0%, var(--sweep-color) 50%, transparent 100%);
+  transform: translate(var(--sweep-from-x), var(--sweep-from-y)) rotate(var(--sweep-angle));
+  opacity: 0;
+  animation: paycard-sweep-vars var(--sweep-duration) var(--sweep-delay) linear infinite;
+}
+@keyframes paycard-sweep-vars {
+  0%   { transform: translate(var(--sweep-from-x), var(--sweep-from-y)) rotate(var(--sweep-angle)); opacity: 0; }
+  6%   { opacity: calc(var(--sweep-peak) * .65); }
+  24%  { opacity: var(--sweep-peak); }
+  40%  { opacity: calc(var(--sweep-peak) * .6); }
+  50%  { opacity: 0; }
+  52%  { transform: translate(var(--sweep-to-x), var(--sweep-to-y)) rotate(var(--sweep-angle)); opacity: 0; }
+  100% { transform: translate(var(--sweep-to-x), var(--sweep-to-y)) rotate(var(--sweep-angle)); opacity: 0; }
+}
+.paycard-sweep.paused { animation-play-state: paused; }
+
+/* Spotlight and cursor glow in silver/ice */
+.cursor-glow {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  filter: blur(18px);
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.32), rgba(159,183,255,0.20), transparent 70%);
+  mix-blend-mode: screen;
+  transform: translate3d(0,0,0);
+}
+.spotlight {
+  background:
+    radial-gradient(360px circle at var(--x) var(--y),
+      rgba(255,255,255,0.10),
+      rgba(159,183,255,0.08) 40%,
+      transparent 60%);
+  mix-blend-mode: screen;
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .paycard-sweep { animation: none; opacity: 0; }
+  .progress-bar { animation: none; }
+}
+
+/* Touch devices: hide custom cursor */
+@media (hover: none) {
+  .cursor-glow, .spotlight { display: none; }
+}
+
+/* Responsive fallback for narrow screens (size preserved) */
+@media (max-width: 720px) {
+  .paycard-bg,
+  .paycard-outer > div { width: 96vw !important; height: auto; }
+}
+
+
+/* ===== Unified Premium Button Theme (paste at end of Global.css) ===== */
+/* Palette hooks */
+:root {
+  --btn-bg: linear-gradient(98deg, rgba(255,255,255,0.10) 12%, rgba(16,18,24,0.92) 100%);
+  --btn-border: rgba(255,255,255,0.12);
+  --btn-shadow: 0 10px 24px -12px rgba(159,183,255,0.28);
+  --btn-text: #ffffff;
+  --btn-hover-bg: linear-gradient(98deg, rgba(255,255,255,0.16) 0%, rgba(159,183,255,0.18) 100%);
+  --btn-active-bg: linear-gradient(98deg, rgba(255,255,255,0.18) 0%, rgba(159,183,255,0.24) 100%);
+  --btn-border-strong: rgba(255,255,255,0.18);
+  --btn-border-weak: rgba(255,255,255,0.07);
+}
+
+
+/* Base visual (keeps sizing defined earlier) */
+.paycard-directionbtn,
+.paycard-assetbtn,
+.paycard-nav,
+.paycard-next {
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border-color: var(--btn-border) !important;
+  box-shadow: var(--btn-shadow) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 18s ease, box-shadow 18s ease, background 22s ease, border-color 22s ease, color 22s ease;
+}
+
+/* Hover */
+.paycard-directionbtn:hover,
+.paycard-assetbtn:hover,
+.paycard-nav:hover,
+.paycard-next:hover {
+  background: var(--btn-hover-bg) !important;
+  border-color: var(--btn-border-strong) !important;
+}
+
+/* “Primary” look for selected/next CTA */
+.paycard-directionbtn.paycard-selected,
+.paycard-assetbtn.paycard-selected,
+.paycard-next {
+  background: var(--btn-active-bg) !important;
+  border-color: var(--btn-border-strong) !important;
+  box-shadow: 0 12px 28px -12px rgba(159,183,255,0.35), inset 0 0 0 1px rgba(255,255,255,0.08) !important;
+}
+
+/* Unselected state keeps the same palette */
+.paycard-directionbtn.paycard-unselected,
+.paycard-assetbtn.paycard-unselected {
+  background: var(--btn-bg) !important;
+  color: #e6e9f2 !important;
+  border-color: var(--btn-border-weak) !important;
+  opacity: 1 !important;
+}
+
+/* Disabled remains subdued */
+.paycard-assetbtn.paycard-disabled {
+  background: linear-gradient(98deg, rgba(255,255,255,0.06) 15%, rgba(10,11,14,0.88) 100%) !important;
+  color: rgba(255,255,255,0.45) !important;
+  border-color: var(--btn-border-weak) !important;
+  box-shadow: none !important;
+}
+
+/* Keep focus ring consistent */
+.paycard-nav:focus-visible,
+.paycard-next:focus-visible,
+.paycard-directionbtn:focus-visible,
+.paycard-assetbtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(159,183,255,0.10), 0 12px 28px -12px rgba(159,183,255,0.32) !important;
+  border-color: var(--btn-border-strong) !important;
+}
+
+button {
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border-color: var(--btn-border) !important;
+  box-shadow: var(--btn-shadow) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 18s ease, box-shadow 18s ease, background 22s ease, border-color 22s ease, color 22s ease;
 }

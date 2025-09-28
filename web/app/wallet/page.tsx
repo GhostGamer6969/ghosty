@@ -29,7 +29,7 @@ export default function WalletPage() {
       const result = await createAccountWithFriendbot(keypair);
 
       if (result.success) {
-        const balance = '10000.0000000'; // Friendbot typically funds with 10,000 XLM
+        const balance = '500'; // Friendbot typically funds with 10,000 XLM
 
         const newWallet: WalletInfo = {
           publicKey: result.accountId || publicKey,
