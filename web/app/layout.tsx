@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import ClientStarfieldProvider from "./starfield/ClientStarfieldProvider";
+// import ClientStarfieldProvider from "./starfield/ClientStarfieldProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,9 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body>
-        <ClientStarfieldProvider>
-          {children}
-        </ClientStarfieldProvider>
+        {/* <ClientStarfieldProvider> */}
+        {children}
+        {/* </ClientStarfieldProvider> */}
       </body>
     </html>
   );
