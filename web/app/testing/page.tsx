@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { StellarSdk, Networks } from "@stellar/stellar-sdk";
+import { useFreighterWallet } from "../hooks/useFreighterWallet";
 
 interface SwapState {
   step: number;
@@ -18,6 +19,8 @@ interface ContractAddresses {
 }
 
 export default function TestingPage() {
+  const { wallet: freighterWallet, connectWallet, disconnectWallet, refreshBalance } = useFreighterWallet();
+  
   const [swapState, setSwapState] = useState<SwapState>({
     step: 0,
     status: "Ready to start",
@@ -67,7 +70,7 @@ export default function TestingPage() {
       setWalletInfo((prev) => ({
         ...prev,
         stellarAddress:
-          "GD2RAKWBEOJ3P5YPURRWW6FRAYJYUQ2PH3GX6ITBM5VKML4O5TLAWWXC",
+          "GC22Y26US6AW3T6DPDWNWMX74BGNITTJQ7VXR3YJEIW64GOVYMZCJXEF",
       }));
     } catch (error) {
       console.error("Failed to initialize wallets:", error);
@@ -170,7 +173,10 @@ export default function TestingPage() {
       setSwapState({
         step: 3,
         status: "Stellar escrow created successfully",
-        data: { stellarEscrowAddress: result.escrowAddress },
+        data: { 
+          ...swapState.data,  // ✅ Keep existing data
+          stellarEscrowAddress: result.escrowAddress 
+        },
       });
     } catch (error) {
       setSwapState({
@@ -199,9 +205,10 @@ export default function TestingPage() {
       setSwapState({
         step: 4,
         status: "ETH deposited successfully",
-        data: {
-          transactionHash:
-            "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        data: { 
+          ...swapState.data,  // ✅ Keep existing data
+          transactionHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+          ethDeposited: true 
         },
       });
     } catch (error) {
@@ -215,28 +222,58 @@ export default function TestingPage() {
 
   const depositXLM = async () => {
     setSwapState({ step: 5, status: "Depositing XLM..." });
-
+  
     try {
-      // This would call the Stellar contract
+      // 🔍 Debug: Log all the values being sent
+      console.log("🔍 Debug - Full swapState:", swapState);
+      console.log("🔍 Debug - swapState.data:", swapState.data);
+      console.log("🔍 Debug - stellarEscrowAddress:", swapState.data?.stellarEscrowAddress);
+      console.log("🔍 Debug - xlmAmount:", swapParams.xlmAmount);
+      console.log("🔍 Debug - calculated amount:", parseFloat(swapParams.xlmAmount) * 1000000);
+      
+      // Check if required values exist
+      if (!swapState.data?.stellarEscrowAddress) {
+        console.error("❌ Missing stellarEscrowAddress");
+        throw new Error("Stellar escrow address is missing. Please create a Stellar escrow first.");
+      }
+      
+      if (!swapParams.xlmAmount || isNaN(parseFloat(swapParams.xlmAmount))) {
+        console.error("❌ Invalid xlmAmount:", swapParams.xlmAmount);
+        throw new Error("Invalid XLM amount. Please check your input.");
+      }
+  
+      const requestBody = {
+        escrowAddress: swapState.data.stellarEscrowAddress,
+        amount: parseFloat(swapParams.xlmAmount) * 1000000,
+      };
+      
+      console.log("🔍 Debug - Request body being sent:", requestBody);
+  
       const response = await fetch("http://localhost:3000/api/deposit-xlm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          escrowAddress: swapState.data?.stellarEscrowAddress,
-          amount: parseFloat(swapParams.xlmAmount) * 1000000,
-        }),
+        body: JSON.stringify(requestBody),
       });
-
+  
+      console.log("🔍 Debug - Response status:", response.status);
+      console.log("🔍 Debug - Response ok:", response.ok);
+  
       if (!response.ok) {
-        throw new Error("Failed to deposit XLM");
+        const errorText = await response.text();
+        console.error("❌ API Error Response:", errorText);
+        throw new Error(`Failed to deposit XLM: ${errorText}`);
       }
-
+  
+      const result = await response.json();
+      console.log("✅ Success - API Response:", result);
+      
       setSwapState({
         step: 5,
         status: "XLM deposited successfully",
         data: { ...swapState.data, xlmDeposited: true },
       });
     } catch (error) {
+      console.error("❌ Deposit XLM Error:", error);
       setSwapState({
         step: 5,
         status: "XLM deposit failed",
@@ -278,21 +315,22 @@ export default function TestingPage() {
 
   const claimETH = async () => {
     setSwapState({ step: 7, status: "Claiming ETH..." });
-
+  
     try {
-      // This would call the Ethereum escrow contract with the revealed secret
       const response = await fetch("http://localhost:3000/api/claim-eth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          escrowAddress: "0x1234567890123456789012345678901234567890", // Add this line
           secret: swapParams.secret,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to claim ETH");
       }
-
+  
+      const result = await response.json();
       setSwapState({
         step: 7,
         status: "ETH claimed successfully - Swap completed!",
