@@ -71,26 +71,26 @@ export default function Navbar() {
         {/* Navigation Links */}
         <div className="hidden md:flex items-center space-x-8">
           
-          <Link
+          {/* <Link
             href="/swap-typeform"
             className="text-white/80 hover:text-white transition-colors duration-300 text-sm tracking-wide font-mono"
           >
             SWAP
-          </Link>
+          </Link> */}
           
          
-          <Link
+          {/* <Link
             href="/starter-pack"
             className="text-white/80 hover:text-white transition-colors duration-300 text-sm tracking-wide font-mono"
           >
             STARTER PACK
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             href="https://github.com/Ghostgamer6969/ghosty"
             className="text-white/80 hover:text-white transition-colors duration-300 text-sm tracking-wide font-mono"
           >
             DOCS
-          </Link>
+          </Link> */}
           
           {/* MetaMask Connection Button */}
           <button

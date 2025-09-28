@@ -112,92 +112,20 @@ export default function Home() {
               NEXT-GEN CRYPTO ECOSYSTEM
             </p>
             
-            {/* Updated Wallet Interface */}
-            <div className="mt-12 backdrop-blur-xl bg-white/5 rounded-3xl p-8 border border-white/10 
-            shadow-[0_0_50px_-12px] shadow-blue-500/10">
-              {!wallet ? (
-                <button
-                  onClick={createWallet}
-                  className="group relative w-full px-8 py-4 bg-gradient-to-r from-blue-600/20 to-blue-400/20 
-                  rounded-xl font-mono text-lg tracking-wider transition-all duration-500 
-                  hover:bg-gradient-to-r hover:from-blue-600/40 hover:to-blue-400/40 
-                  border border-white/10 hover:border-white/20 cursor-crosshair overflow-hidden"
+            {/* Updated Initialize Button - Direct Link */}
+            <div className="mt-12">
+              <Link href="/swap-typeform">
+                <button className="group relative w-full px-8 py-4 bg-gradient-to-r from-blue-600/20 to-blue-400/20 
+                rounded-xl font-mono text-lg tracking-wider transition-all duration-500 
+                hover:bg-gradient-to-r hover:from-blue-600/40 hover:to-blue-400/40 
+                border border-white/10 hover:border-white/20 cursor-crosshair overflow-hidden"
                 >
                   <span className="relative z-10">INITIALIZE WALLET</span>
                   <div className="absolute inset-0 -translate-y-full group-hover:translate-y-0 
                   bg-gradient-to-r from-blue-600/20 to-blue-400/20 transition-transform duration-500"></div>
                 </button>
-              ) : (
-                <div className="space-y-6">
-                  {/* Wallet Info Cards */}
-                  <div className="p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 
-                  hover:border-white/20 transition-all duration-300 group cursor-default">
-                    <span className="text-blue-400 font-mono text-xs tracking-wider">PUBLIC KEY</span>
-                    <div className="mt-2 text-sm font-mono tracking-wide text-white/80 break-all 
-                    group-hover:text-white transition-colors duration-300">{wallet.publicKey}</div>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 
-                  hover:border-white/20 transition-all duration-300 group cursor-default">
-                    <span className="text-blue-400 font-mono text-xs tracking-wider">PRIVATE KEY</span>
-                    <div className="mt-2 text-sm font-mono tracking-wide text-white/80 break-all 
-                    group-hover:text-white transition-colors duration-300">{wallet.privateKey}</div>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 
-                  hover:border-white/20 transition-all duration-300 group cursor-default">
-                    <span className="text-blue-400 font-mono text-xs tracking-wider">BALANCE</span>
-                    <div className="mt-2 text-2xl font-mono tracking-wide text-white">
-                      {wallet.balance ?? '0'} <span className="text-sm text-purple-400">XLM</span>
-                    </div>
-                  </div>
-                  {/* Action Buttons */}
-                  {!wallet.isFunded ? (
-                    <button 
-                      onClick={fundWallet}
-                      disabled={isLoading}
-                      className="group relative w-full px-8 py-4 bg-gradient-to-r from-blue-600/20 to-blue-400/20 
-                      rounded-xl font-mono text-lg tracking-wider transition-all duration-500 
-                      hover:bg-gradient-to-r hover:from-blue-600/40 hover:to-blue-400/40 
-                      disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 
-                      hover:border-white/20 cursor-crosshair overflow-hidden"
-                    >
-                      <span className="relative z-10">{isLoading ? 'PROCESSING...' : 'FUND WALLET'}</span>
-                      <div className="absolute inset-0 -translate-y-full group-hover:translate-y-0 
-                      bg-gradient-to-r from-blue-600/20 to-blue-400/20 transition-transform duration-500"></div>
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={deployWallet}
-                      disabled={isLoading || wallet.isDeployed}
-                      className="group relative w-full px-8 py-4 bg-gradient-to-r from-blue-600/20 to-blue-400/20 
-                      rounded-xl font-mono text-lg tracking-wider transition-all duration-500 
-                      hover:bg-gradient-to-r hover:from-blue-600/40 hover:to-blue-400/40 
-                      disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 
-                      hover:border-white/20 cursor-crosshair overflow-hidden"
-                    >
-                      <span className="relative z-10">{wallet.isDeployed ? 'DEPLOYMENT COMPLETE' : isLoading ? 'DEPLOYING...' : 'DEPLOY WALLET'}</span>
-                      <div className="absolute inset-0 -translate-y-full group-hover:translate-y-0 
-                      bg-gradient-to-r from-blue-600/20 to-blue-400/20 transition-transform duration-500"></div>
-                    </button>
-                  )}
-                </div>
-              )}
+              </Link>
             </div>
-
-            {/* Launch Button */}
-            {wallet?.isDeployed && (
-              <div className="text-center mt-8">
-                <Link href="/swap-typeform">
-                  <button className="group relative px-16 py-4 bg-gradient-to-r from-blue-500/20 to-blue-300/20 
-                  rounded-xl font-mono text-lg tracking-wider transition-all duration-500 
-                  hover:bg-gradient-to-r hover:from-blue-500/40 hover:to-blue-300/40 
-                  border border-white/10 hover:border-white/20 cursor-crosshair overflow-hidden">
-                    <span className="relative z-10">LAUNCH APP</span>
-                    <div className="absolute inset-0 -translate-y-full group-hover:translate-y-0 
-                    bg-gradient-to-r from-blue-500/20 to-blue-300/20 transition-transform duration-500"></div>
-                  </button>
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>

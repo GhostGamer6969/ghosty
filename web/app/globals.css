@@ -58,3 +58,68 @@ p, h1, h2, h3, h4, h5, h6, span, button {
 p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, span:hover, button:hover {
   transform: scale(1.02);
 }
+
+
+@keyframes scrollArrow {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+
+.animated-text-stroke {
+  -webkit-text-stroke: 1.5px white;
+  text-stroke: 1.5px white; /* for some browsers */
+  position: relative;
+  user-select: none;
+}
+
+.animated-triangle {
+  position: absolute;
+  top: 50%;
+  left: -3rem;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 3rem;
+  background: white;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  opacity: 0.8;
+  animation: triangle-slide 2s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px white);
+  z-index: 10;
+}
+
+@keyframes triangle-slide {
+  0% {
+    left: -13rem;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes arrowSlide {
+  0% {
+    transform: translateX(-80px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(680px);
+    opacity: 0;
+  }
+}
