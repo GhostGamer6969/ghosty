@@ -1,5 +1,5 @@
 {
-  "name": "@intostellar/relayer-service",
+  "name": "@supernova/relayer-service",
   "version": "1.0.0",
   "description": "Off-chain relayer service for Fusion+ cross-chain atomic swaps between Ethereum and Stellar",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
     "fusion",
     "relayer"
   ],
-  "author": "IntoStellar Team",
+  "author": "supernova Team",
   "license": "MIT",
   "dependencies": {
     "@stellar/stellar-sdk": "^11.0.0",

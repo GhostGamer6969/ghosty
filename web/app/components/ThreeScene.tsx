@@ -3,9 +3,13 @@
 import { useEffect, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
-export default function ThreeScene() {
+interface ThreeSceneProps {
+  onReachedEdge?: () => void;
+}
+
+export default function ThreeScene({ onReachedEdge }: ThreeSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -45,22 +49,31 @@ export default function ThreeScene() {
     controls.dampingFactor = 0.05;
     controlsRef.current = controls;
 
-    // Load the endurance spaceship model
-    const loader = new GLTFLoader();
-    loader.load('/endurance_spaceship.glb', (gltf) => {
-      const model = gltf.scene;
-      modelRef.current = model;
+    // Load the spaceship OBJ model
+    const loader = new OBJLoader();
+    loader.load('/model.obj', (obj) => {
+      modelRef.current = obj;
       
-      // Scale and position the model
-      model.scale.set(0.05, 0.05, 0.05);
-      model.position.set(-10, 0, 0); // Start at leftmost position
+      // Scale the model
+      obj.scale.set(0.005, 0.005, 0.005);
       
-      // Tilt the model 45 degrees
-      model.rotation.y = Math.PI / 4; // 45 degrees
+      // Set random starting position from edges
+      const startingEdges = [
+        { x: -10, y: (Math.random() * 10) - 5 },   // left edge
+        { x: 10, y: (Math.random() * 10) - 5 },    // right edge
+        { x: (Math.random() * 20) - 10, y: 5 },    // top edge
+        { x: (Math.random() * 20) - 10, y: -5 }    // bottom edge
+      ];
       
-      scene.add(model);
+      const startPos = startingEdges[Math.floor(Math.random() * startingEdges.length)];
+      obj.position.set(startPos.x, startPos.y, 0);
+      
+      // Tilt the model
+      obj.rotation.y = Math.PI / 4;
+      
+      scene.add(obj);
     }, undefined, (error) => {
-      console.error('Error loading model:', error);
+      console.error('Error loading OBJ model:', error);
     });
 
     // Lighting
@@ -78,13 +91,28 @@ export default function ThreeScene() {
     // Animation
     let time = 0;
     const animate = () => {
-      time += 0.0005; // Much slower movement
+      time += 0.0005;
       
-      // Rotate the model like a wheel
       if (modelRef.current) {
-        modelRef.current.rotation.z += 0.005; // Slower rotation
-        // Move slowly from left to right with smoother movement
-        modelRef.current.position.x = Math.sin(time) * 2; // Reduced amplitude and slower
+        // Rotate the model
+        modelRef.current.rotation.z += 0.005;
+        
+        // Gentle drift movement
+        modelRef.current.position.x += Math.sin(time) * 0.02;
+        modelRef.current.position.y += Math.cos(time) * 0.01;
+        
+        // Check boundaries
+        const limitX = 9;
+        const limitY = 4;
+        
+        if (
+          modelRef.current.position.x >= limitX ||
+          modelRef.current.position.x <= -limitX ||
+          modelRef.current.position.y >= limitY ||
+          modelRef.current.position.y <= -limitY
+        ) {
+          onReachedEdge?.();
+        }
       }
       
       // Update controls
@@ -118,7 +146,7 @@ export default function ThreeScene() {
       }
       renderer.dispose();
     };
-  }, []);
+  }, [onReachedEdge]); // Add onReachedEdge to dependency array
 
   return (
     <div 
@@ -133,4 +161,4 @@ export default function ThreeScene() {
       }}
     />
   );
-} 
+}

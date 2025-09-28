@@ -1,14 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import InterstellarButton from '../components/InterstellarButton';
-import InteractiveBalls from '../components/InteractiveBalls';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
+import InterstellarButton from "../components/InterstellarButton";
+import InteractiveBalls from "../components/InteractiveBalls";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  useSpring,
+} from "framer-motion";
 
 interface SwapForm {
   ethAddress: string;
-  walletAddress: string; // Stellar address
+  walletAddress: string;
   direction: string;
   fromAsset: string;
   fromAmount: string;
@@ -30,205 +36,209 @@ interface Question {
   id: string;
   title: string;
   subtitle: string;
-  type: 'connect' | 'direction' | 'asset' | 'amount' | 'slippage' | 'wallet' | 'confirm';
+  type:
+    | "connect"
+    | "direction"
+    | "asset"
+    | "amount"
+    | "slippage"
+    | "wallet"
+    | "confirm";
   options?: string[];
 }
 
 const questions: Question[] = [
   {
-    id: 'connect',
-    title: 'Connect your wallets',
-    subtitle: 'Link your Ethereum (Metamask) and Stellar (Freighter) wallets to continue',
-    type: 'connect'
+    id: "connect",
+    title: "Connect your wallets",
+    subtitle:
+      "Link your Ethereum (Metamask) and Stellar (Freighter) wallets to continue",
+    type: "connect",
   },
   {
-    id: 'direction',
-    title: 'Which direction do you want to swap?',
-    subtitle: 'Choose your swap direction',
-    type: 'direction',
-    options: ['ETH → XLM', 'XLM → ETH']
+    id: "direction",
+    title: "Which direction do you want to swap?",
+    subtitle: "Choose your swap direction",
+    type: "direction",
+    options: ["ETH → XLM", "XLM → ETH"],
   },
   {
-    id: 'fromAsset',
-    title: 'Select the asset you are swapping',
-    subtitle: 'Select the asset you want to convert (only ETH available)',
-    type: 'asset',
-    options: ['USDC', 'USDT', 'BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'LINK']
+    id: "fromAsset",
+    title: "Select the asset you are swapping",
+    subtitle: "Select the asset you want to convert (only ETH available)",
+    type: "asset",
+    options: ["USDC", "USDT", "BTC", "ETH", "SOL", "ADA", "DOT", "LINK"],
   },
   {
-    id: 'fromAmount',
-    title: 'How much do you want to swap?',
-    subtitle: 'Enter the amount of ETH you want to convert to XLM',
-    type: 'amount'
+    id: "fromAmount",
+    title: "How much do you want to swap?",
+    subtitle: "Enter the amount of ETH you want to convert to XLM",
+    type: "amount",
   },
   {
-    id: 'wallet',
-    title: 'Where should we send your XLM?',
-    subtitle: 'Enter your Stellar wallet address',
-    type: 'wallet'
+    id: "wallet",
+    title: "Where should we send your XLM?",
+    subtitle: "Enter your Stellar wallet address",
+    type: "wallet",
   },
   {
-    id: 'confirm',
-    title: 'Ready to transcend dimensions?',
-    subtitle: 'Review your swap details and conversion rate before proceeding',
-    type: 'confirm'
-  }
+    id: "confirm",
+    title: "Ready to transcend dimensions?",
+    subtitle: "Review your swap details and conversion rate before proceeding",
+    type: "confirm",
+  },
 ];
+
+const cardVariants = {
+  initial: { opacity: 0, scale: 0.9, y: 90, filter: "blur(14px)", zIndex: 0 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    filter: "blur(0px)",
+    zIndex: 2,
+    transition: { type: "spring" as const, stiffness: 140, damping: 16 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.84,
+    y: -70,
+    filter: "blur(14px)",
+    zIndex: 0,
+    transition: { duration: 0.3 },
+  },
+};
 
 export default function SwapTypeformPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [swapForm, setSwapForm] = useState<SwapForm>({
-    ethAddress: '',
-    walletAddress: '',
-    direction: '',
-    fromAsset: '',
-    fromAmount: ''
+    ethAddress: "",
+    walletAddress: "",
+    direction: "",
+    fromAsset: "",
+    fromAmount: "",
   });
   const [conversionRate, setConversionRate] = useState<ConversionRate>({
-    fromAmount: '',
-    toAmount: '',
-    rate: '',
-    gasEstimate: '',
+    fromAmount: "",
+    toAmount: "",
+    rate: "",
+    gasEstimate: "",
     loading: false,
-    error: null
+    error: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-  
 
-  const [isLoaded, setIsLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(console.error);
-    }
-    
-    // Trigger fade in after a short delay
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  const currentQuestion = questions[currentStep];
+  const progress = ((currentStep + 1) / questions.length) * 100;
+  const isEthToXlm = swapForm.direction === "ETH → XLM";
 
+  // 3D tilt / glare
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const rotateX = useTransform(my, [0, 1], [14, -14]);
+  const rotateY = useTransform(mx, [0, 1], [-18, 18]);
+  const rX = useSpring(rotateX, { stiffness: 180, damping: 18 });
+  const rY = useSpring(rotateY, { stiffness: 180, damping: 18 });
+
+  const [shine, setShine] = useState({ x: 200, y: 160 });
+
+  const onCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mx.set(x);
+    my.set(y);
+    setShine({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+  const onCardMouseLeave = () => {
+    mx.set(0.5);
+    my.set(0.5);
+  };
+
+  // Cursor / spotlight
+  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const onRootMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    setCursor({ x: e.clientX, y: e.clientY });
+  };
+
+  // Navigation
+  const handleNext = useCallback(() => {
+    if (currentStep < questions.length - 1) setCurrentStep(currentStep + 1);
+  }, [currentStep]);
+  const handleBack = useCallback(() => {
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
+  }, [currentStep]);
+  const handleSwap = useCallback(() => {
+    router.push(
+      `/swap-typeform/progress?direction=${encodeURIComponent(
+        swapForm.direction
+      )}`
+    );
+  }, [router, swapForm.direction]);
+
+  // Key press advance
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        
-        // Check if current question is answered
-        const currentQuestion = questions[currentStep];
-        let hasAnswer = false;
-        
-        switch (currentQuestion.type) {
-          case 'connect':
-            hasAnswer = !!swapForm.ethAddress && !!swapForm.walletAddress;
+        const q = questions[currentStep];
+        let ok = false;
+        switch (q.type) {
+          case "connect":
+            ok = !!swapForm.ethAddress && !!swapForm.walletAddress;
             break;
-          case 'direction':
-            hasAnswer = !!swapForm.direction;
+          case "direction":
+            ok = !!swapForm.direction;
             break;
-          case 'asset':
-            hasAnswer = !!swapForm.fromAsset;
+          case "asset":
+            ok = !!swapForm.fromAsset;
             break;
-          case 'amount':
-            hasAnswer = !!swapForm.fromAmount && parseFloat(swapForm.fromAmount) > 0;
+          case "amount":
+            ok = !!swapForm.fromAmount && parseFloat(swapForm.fromAmount) > 0;
             break;
-          case 'wallet':
-            hasAnswer = !!swapForm.walletAddress && swapForm.walletAddress.length > 0;
+          case "wallet":
+            ok = !!swapForm.walletAddress && swapForm.walletAddress.length > 0;
             break;
-          case 'confirm':
-            hasAnswer = true; // Always valid on confirm step
+          case "confirm":
+            ok = true;
             break;
           default:
-            hasAnswer = false;
+            ok = false;
         }
-        
-        if (hasAnswer) {
-          if (currentStep < questions.length - 1) {
-            handleNext();
-          } else if (currentStep === questions.length - 1 && !isLoading) {
-            handleSwap();
-          }
+        if (ok) {
+          if (currentStep < questions.length - 1) handleNext();
+          else if (!isLoading) handleSwap();
         }
       }
     };
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [currentStep, swapForm, isLoading, handleNext, handleSwap]);
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [currentStep, swapForm, isLoading]);
-
-  const handleNext = () => {
-    if (currentStep < questions.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
+  // Inputs
   const handleInputChange = (value: string | number) => {
-    const currentQuestion = questions[currentStep];
-    console.log('Input change:', { field: currentQuestion.id, value, currentStep });
-    setSwapForm(prev => ({
-      ...prev,
-      [currentQuestion.id]: value
-    }));
-
-    // Fetch conversion rate when amount changes
-    if (currentQuestion.id === 'fromAmount' && typeof value === 'string') {
+    const q = questions[currentStep];
+    setSwapForm((prev) => ({ ...prev, [q.id]: value }));
+    if (q.id === "fromAmount" && typeof value === "string")
       getConversionRate(value);
-    }
   };
 
-  const hasValidAnswer = () => {
-    const currentQuestion = questions[currentStep];
-    
-    switch (currentQuestion.type) {
-      case 'connect':
-        return !!swapForm.ethAddress && !!swapForm.walletAddress;
-      case 'asset':
-        return !!swapForm[currentQuestion.id as keyof SwapForm];
-      case 'amount':
-        return !!swapForm.fromAmount && parseFloat(swapForm.fromAmount) > 0;
-      case 'wallet':
-        return !!swapForm.walletAddress && swapForm.walletAddress.length > 0;
-      case 'confirm':
-        return true; // Always valid on confirm step
-      default:
-        return false;
-    }
-  };
-
-  // 1inch API integration via our API route
   const getConversionRate = async (amount: string) => {
     if (!amount || parseFloat(amount) <= 0) {
-      setConversionRate(prev => ({ ...prev, loading: false, error: null }));
+      setConversionRate((prev) => ({ ...prev, loading: false, error: null }));
       return;
     }
-
-    setConversionRate(prev => ({ ...prev, loading: true, error: null }));
-
+    setConversionRate((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      // Call our API route instead of 1inch directly
       const response = await fetch(`/api/1inch/quote?amount=${amount}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversion rate');
-      }
-
+      if (!response.ok) throw new Error("Failed to fetch conversion rate");
       const result = await response.json();
-      
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
+      if (result.error) throw new Error(result.error);
       const { data } = result;
-      
       setConversionRate({
         fromAmount: data.fromAmount,
         toAmount: data.toAmount,
@@ -238,301 +248,393 @@ export default function SwapTypeformPage() {
         xlmPriceUSD: data.xlmPriceUSD?.toString(),
         source: data.source,
         loading: false,
-        error: null
+        error: null,
       });
     } catch (error) {
-      console.error('Error fetching conversion rate:', error);
-      setConversionRate(prev => ({
+      setConversionRate((prev) => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch rate'
+        error: error instanceof Error ? error.message : "Failed to fetch rate",
       }));
     }
   };
 
-  const router = useRouter();
-
-  const handleSwap = () => {
-    router.push(`/swap-typeform/progress?direction=${encodeURIComponent(swapForm.direction)}`);
-  };
-
-
-  const currentQuestion = questions[currentStep];
-  const progress = ((currentStep + 1) / questions.length) * 100;
-
-  const isEthToXlm = swapForm.direction === 'ETH → XLM';
+  // Updated: premium monochrome glass card background
+  const cardBg =
+    "relative flex flex-col items-center justify-center w-[520px] h-[320px] sm:w-[620px] sm:h-[370px] rounded-[28px] overflow-hidden bg-gradient-to-tl from-[#15181f] via-[#0f1116] to-[#0a0c10] border border-white/10 shadow-[0_0_96px_-16px_rgba(255,255,255,0.10)] z-[2] paycard-glow";
 
   const renderQuestion = () => {
     switch (currentQuestion.type) {
-      case 'connect':
+      case "connect":
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Ethereum Wallet */}
-            <div className="p-6 rounded-lg border-2 border-white/20 bg-white/5 text-center text-white/80 space-y-4">
-              <h3 className="text-xl font-bold">Ethereum Wallet</h3>
-              {swapForm.ethAddress ? (
-                <p className="font-mono break-all text-sm">{swapForm.ethAddress}</p>
-              ) : (
-                <InterstellarButton onClick={async () => {
-                  if ((window as any).ethereum) {
-                    try {
-                      const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-                      setSwapForm(prev => ({ ...prev, ethAddress: accounts[0] }));
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  } else {
-                    alert('MetaMask not detected');
-                  }
-                }}>Connect Metamask</InterstellarButton>
-              )}
-            </div>
-            {/* Stellar Wallet */}
-            <div className="p-6 rounded-lg border-2 border-white/20 bg-white/5 text-center text-white/80 space-y-4">
-              <h3 className="text-xl font-bold">Stellar Wallet</h3>
-              {swapForm.walletAddress ? (
-                <p className="font-mono break-all text-sm">{swapForm.walletAddress}</p>
-              ) : (
-                <InterstellarButton onClick={async () => {
-                  try {
-                    const { connect: connectStellar, getPublicKey } = await import('../lib/stellar-wallets-kit');
-                    await connectStellar();
-                    const pk = await getPublicKey();
-                    if (pk) setSwapForm(prev => ({ ...prev, walletAddress: pk }));
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}>Connect Freighter</InterstellarButton>
-              )}
+          <div className="flex flex-col gap-5 w-full px-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="w-1/2 flex flex-col items-center gap-2">
+                <span className="paycard-label text-base">Ethereum Wallet</span>
+                {swapForm.ethAddress ? (
+                  <span className="paycard-value text-[15px]">
+                    {swapForm.ethAddress}
+                  </span>
+                ) : (
+                  <InterstellarButton className="magnetic-btn">
+                    <span
+                      onClick={async () => {
+                        if ((window as any).ethereum) {
+                          try {
+                            const accounts = await (
+                              window as any
+                            ).ethereum.request({
+                              method: "eth_requestAccounts",
+                            });
+                            setSwapForm((prev) => ({
+                              ...prev,
+                              ethAddress: accounts[0],
+                            }));
+                          } catch {
+                            alert("Failed to connect to MetaMask");
+                          }
+                        } else {
+                          alert("MetaMask not detected");
+                        }
+                      }}
+                    >
+                      Connect MetaMask
+                    </span>
+                  </InterstellarButton>
+                )}
+              </div>
+              <div className="w-[2px] h-14 mx-2 bg-gradient-to-b from-white/10 to-white/5" />
+              <div className="w-1/2 flex flex-col items-center gap-2">
+                <span className="paycard-label text-base">Stellar Wallet</span>
+                {swapForm.walletAddress ? (
+                  <span className="paycard-value text-[15px]">
+                    {swapForm.walletAddress}
+                  </span>
+                ) : (
+                  <InterstellarButton className="magnetic-btn">
+                    <span
+                      onClick={async () => {
+                        try {
+                          const { connect: connectStellar, getPublicKey } =
+                            await import("../lib/stellar-wallets-kit");
+                          await connectStellar();
+                          const pk = await getPublicKey();
+                          if (pk)
+                            setSwapForm((prev) => ({
+                              ...prev,
+                              walletAddress: pk,
+                            }));
+                        } catch {
+                          // silent
+                        }
+                      }}
+                    >
+                      Connect Freighter
+                    </span>
+                  </InterstellarButton>
+                )}
+              </div>
             </div>
           </div>
         );
-      case 'direction':
+      case "direction":
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-row gap-4 w-full justify-center">
             {currentQuestion.options?.map((option) => (
               <button
                 key={option}
                 onClick={() => handleInputChange(option)}
-                className={`
-                  p-6 rounded-lg border-2 transition-all duration-300
-                  ${swapForm.direction === option
-                    ? 'border-white/50 bg-white/10 text-white'
-                    : 'border-white/20 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10'
-                  }
-                `}
+                className={`paycard-directionbtn ${
+                  swapForm.direction === option
+                    ? "paycard-selected"
+                    : "paycard-unselected"
+                }`}
               >
-                <div className="text-xl font-bold mb-2">{option}</div>
-                <div className="text-sm opacity-70">
-                  {option === 'ETH → XLM' ? 'Ethereum to Stellar' : 'Stellar to Ethereum'}
-                </div>
+                <span className="font-semibold text-[18px]">{option}</span>
+                <span className="text-xs block opacity-70">
+                  {option === "ETH → XLM"
+                    ? "Ethereum to Stellar"
+                    : "Stellar to Ethereum"}
+                </span>
               </button>
             ))}
           </div>
         );
-      case 'asset':
+      case "asset":
         return (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="flex flex-row gap-3 w-full justify-center">
             {currentQuestion.options?.map((option) => (
               <button
                 key={option}
-                onClick={() => (isEthToXlm ? option === 'ETH' : option === 'XLM') ? handleInputChange(option) : null}
-                disabled={isEthToXlm ? option !== 'ETH' : option !== 'XLM'}
-                className={`
-                  p-4 rounded-lg border-2 transition-all duration-300
-                  ${(isEthToXlm ? option === 'ETH' : option === 'XLM')
-                    ? swapForm.fromAsset === option
-                      ? 'border-white/50 bg-white/10 text-white'
-                      : 'border-white/20 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10'
-                    : 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed opacity-50'
-                  }
-                `}
+                onClick={() =>
+                  isEthToXlm
+                    ? option === "ETH" && handleInputChange(option)
+                    : null
+                }
+                disabled={isEthToXlm ? option !== "ETH" : true}
+                className={`paycard-assetbtn ${
+                  isEthToXlm
+                    ? option === "ETH"
+                      ? swapForm.fromAsset === option
+                        ? "paycard-selected"
+                        : "paycard-unselected"
+                      : "paycard-disabled"
+                    : "paycard-disabled"
+                }`}
               >
-                <div className="text-lg font-bold mb-1">{option}</div>
-                <div className="text-xs opacity-70">
-                  {option === 'ETH' ? 'Available' : 'Coming Soon'}
-                </div>
+                <span className="font-semibold text-[16px]">{option}</span>
+                <span className="text-[11px] opacity-70">
+                  {option === "ETH" ? "Available" : "Coming Soon"}
+                </span>
               </button>
             ))}
           </div>
         );
-
-      case 'amount':
+      case "amount":
         return (
-          <div className="max-w-md mx-auto">
+          <div className="w-full flex flex-col items-center">
             <input
               type="number"
-              placeholder={isEthToXlm ? 'ETH amount' : 'XLM amount'}
+              placeholder={isEthToXlm ? "ETH amount" : "XLM amount"}
               value={swapForm.fromAmount}
               onChange={(e) => handleInputChange(e.target.value)}
-              className="w-full px-6 py-3 text-xl text-center bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/50 font-mono focus:outline-none focus:border-white/50 transition-colors"
+              className="paycard-input"
+              min={0}
+              aria-label={`Enter ${isEthToXlm ? "ETH" : "XLM"} amount`}
+              role="spinbutton"
             />
           </div>
         );
-
-      case 'slippage':
-        return null; // Slippage step removed
-
-      case 'wallet':
+      case "wallet":
         return (
-          <div className="max-w-md mx-auto">
+          <div className="w-full flex flex-col items-center">
             <input
               type="text"
               placeholder="G..."
               value={swapForm.walletAddress}
-              onChange={(e) => {
-                console.log('Wallet input change:', e.target.value);
-                setSwapForm(prev => ({
+              onChange={(e) =>
+                setSwapForm((prev) => ({
                   ...prev,
-                  walletAddress: e.target.value
-                }));
-              }}
-              className="w-full px-6 py-3 text-base text-center bg-black/40 border border-white/50 rounded-lg text-white placeholder-white/50 font-mono focus:outline-none focus:border-white/70 focus:bg-black/60 transition-colors"
+                  walletAddress: e.target.value,
+                }))
+              }
+              className="paycard-input"
             />
           </div>
         );
-
-      case 'confirm':
+      case "confirm":
         return (
-          <div className="max-w-md mx-auto space-y-4">
-            <div className="bg-white/10 border border-white/20 rounded-lg p-4">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-white/70 text-sm">Direction:</span>
-                <span className="text-white font-mono text-sm">{swapForm.direction}</span>
+          <div className="flex flex-col items-center gap-3 w-full">
+            <span className="text-[17px] text-white/85 mb-1">
+              Review Your Swap
+            </span>
+            <div className="paycard-details">
+              <div>
+                <span className="paycard-label">Direction:</span>
+                <span className="paycard-value">{swapForm.direction}</span>
               </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-white/70 text-sm">From:</span>
-                <span className="text-white font-mono text-sm">{swapForm.fromAmount} {swapForm.fromAsset}</span>
+              <div>
+                <span className="paycard-label">From:</span>
+                <span className="paycard-value">
+                  {swapForm.fromAmount} {swapForm.fromAsset}
+                </span>
               </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-white/70 text-sm">To:</span>
-                <span className="text-white font-mono text-sm">
-                  {conversionRate.loading ? 'Loading...' : conversionRate.toAmount ? `${conversionRate.toAmount} ${isEthToXlm ? 'XLM' : 'ETH'}` : '~0'}
+              <div>
+                <span className="paycard-label">To:</span>
+                <span className="paycard-value">
+                  {conversionRate.loading
+                    ? "Loading..."
+                    : conversionRate.toAmount
+                    ? `${conversionRate.toAmount} ${isEthToXlm ? "XLM" : "ETH"}`
+                    : "~0"}
                 </span>
               </div>
               {conversionRate.rate && (
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-white/70 text-sm">Rate:</span>
-                  <span className="text-white font-mono text-sm">
-                    {isEthToXlm ? `1 ETH = ${conversionRate.rate} XLM` : `1 XLM = ${conversionRate.rate} ETH`}
+                <div>
+                  <span className="paycard-label">Rate:</span>
+                  <span className="paycard-value">
+                    {isEthToXlm
+                      ? `1 ETH = ${conversionRate.rate} XLM`
+                      : `1 XLM = ${conversionRate.rate} ETH`}
                   </span>
                 </div>
               )}
               {conversionRate.ethPriceUSD && (
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-white/70 text-sm">ETH Price:</span>
-                  <span className="text-white font-mono text-sm">${conversionRate.ethPriceUSD}</span>
+                <div>
+                  <span className="paycard-label">ETH Price:</span>
+                  <span className="paycard-value">
+                    ${conversionRate.ethPriceUSD}
+                  </span>
                 </div>
               )}
               {conversionRate.xlmPriceUSD && (
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-white/70 text-sm">XLM Price:</span>
-                  <span className="text-white font-mono text-sm">${conversionRate.xlmPriceUSD}</span>
+                <div>
+                  <span className="paycard-label">XLM Price:</span>
+                  <span className="paycard-value">
+                    ${conversionRate.xlmPriceUSD}
+                  </span>
                 </div>
               )}
               {conversionRate.gasEstimate && (
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-white/70 text-sm">Gas:</span>
-                  <span className="text-white font-mono text-sm">~{conversionRate.gasEstimate} ETH</span>
+                <div>
+                  <span className="paycard-label">Gas:</span>
+                  <span className="paycard-value">
+                    ~{conversionRate.gasEstimate} ETH
+                  </span>
                 </div>
               )}
               {conversionRate.error && (
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-red-400 text-sm">Error:</span>
-                  <span className="text-red-300 font-mono text-xs">{conversionRate.error}</span>
+                <div>
+                  <span className="text-red-400 font-bold">Error:</span>
+                  <span className="text-red-300">{conversionRate.error}</span>
                 </div>
               )}
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-white/70 text-sm">Network:</span>
-                <span className="text-white font-mono text-sm">{isEthToXlm ? 'Ethereum → Stellar' : 'Stellar → Ethereum'}</span>
+              <div>
+                <span className="paycard-label">Network:</span>
+                <span className="paycard-value">
+                  {isEthToXlm ? "Ethereum → Stellar" : "Stellar → Ethereum"}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/70 text-sm">Wallet:</span>
-                <span className="text-white font-mono text-xs">{swapForm.walletAddress.slice(0, 8)}...{swapForm.walletAddress.slice(-8)}</span>
+              <div>
+                <span className="paycard-label">Wallet:</span>
+                <span className="paycard-value text-xs">
+                  {swapForm.walletAddress
+                    ? `${swapForm.walletAddress.slice(0, 8)}...${swapForm.walletAddress.slice(-8)}`
+                    : ""}
+                </span>
               </div>
             </div>
           </div>
         );
-
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#000913] relative overflow-hidden">
-      {/* Interactive Background */}
+    <div
+      className="swap-bg min-h-screen flex items-center justify-center swap-overflow"
+      onMouseMove={onRootMouseMove}
+    >
       <InteractiveBalls />
-      
-      {/* Glassmorphism Overlay */}
-      <div className="fixed inset-0 backdrop-blur-[100px] pointer-events-none" />
 
-      {/* Content */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 h-screen flex items-center justify-center p-4"
-      >
-        <div className="max-w-4xl w-full bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10
-        shadow-[0_0_50px_-12px] shadow-[#45B7D1]/20">
-          {/* Progress Bar */}
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            className="h-1 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-t-3xl"
-          />
+      {/* Spotlight overlay */}
+      <div
+        className="spotlight pointer-events-none fixed inset-0 z-10"
+        style={{
+          ["--x" as any]: `${cursor.x}px`,
+          ["--y" as any]: `${cursor.y}px`,
+        }}
+      />
 
-          <div className="p-8 space-y-8">
-            {/* Question Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r 
-              from-white to-[#45B7D1] font-['Cyberway'] text-center"
-            >
-              {currentQuestion.title}
-            </motion.h1>
-
-            {/* Question Content */}
+      <div className="paycard-outer flex flex-col items-center justify-center relative z-20">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {[2, 1].map((idx) => (
             <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
-              {renderQuestion()}
-            </motion.div>
-
-            {/* Navigation */}
-            <div className="flex justify-between items-center pt-8">
-              {currentStep > 0 && (
-                <motion.button
-                  whileHover={{ x: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleBack}
-                  className="px-6 py-3 text-[#45B7D1] hover:text-white transition-colors 
-                  font-['Cyberway'] flex items-center gap-2"
-                >
-                  ← Back
-                </motion.button>
-              )}
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={currentStep < questions.length - 1 ? handleNext : handleSwap}
-                className="px-8 py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-xl
-                font-['Cyberway'] text-white shadow-lg shadow-[#4ECDC4]/20 
-                hover:shadow-[#4ECDC4]/40 transition-all duration-300"
-              >
-                {currentStep < questions.length - 1 ? 'Continue' : 'Execute Swap'}
-              </motion.button>
-            </div>
-          </div>
+              key={idx}
+              className="paycard-bg shadow-md pointer-events-none"
+              style={{
+                zIndex: 1,
+                transform: `scale(${0.95 - idx * 0.03}) translateY(${10 * idx}px)`,
+                opacity: 1 / (2 * (idx + 1)),
+                filter: "blur(14px)",
+              }}
+              initial={false}
+              animate={{ opacity: 0.16 / (1 + idx), filter: "blur(24px)" }}
+            />
+          ))}
         </div>
-      </motion.div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            ref={cardRef}
+            className={cardBg}
+            key={currentStep}
+            variants={cardVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ type: "spring", stiffness: 140, damping: 16 }}
+            onMouseMove={onCardMouseMove}
+            onMouseLeave={onCardMouseLeave}
+            style={{
+              rotateX: rX,
+              rotateY: rY,
+              transformStyle: "preserve-3d",
+              perspective: 1000,
+            }}
+            whileHover={{ scale: 1.015 }}
+          >
+            {/* moving circular specular */}
+            <div
+              className="paycard-shine"
+              style={{
+                ["--sx" as any]: `${shine.x}px`,
+                ["--sy" as any]: `${shine.y}px`,
+              }}
+            />
+            {/* sweeping shiny line */}
+            <div className="paycard-sweep" aria-hidden="true" />
+
+            <div className="w-full flex flex-col items-center px-5">
+              <span className="paycard-question-title">
+                {currentQuestion.title}
+              </span>
+              <span className="paycard-question-subtitle">
+                {currentQuestion.subtitle}
+              </span>
+              <div className="w-full flex flex-col items-center pt-7">
+                {renderQuestion()}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="flex justify-between items-center w-[520px] sm:w-[620px] mx-auto pt-10 gap-4 z-10">
+          {currentStep > 0 ? (
+            <motion.button
+              whileHover={{ y: -2, scale: 1.04 }}
+              whileTap={{ scale: 0.98 }}
+              className="paycard-nav"
+              onClick={handleBack}
+            >
+              ← Back
+            </motion.button>
+          ) : (
+            <span />
+          )}
+          <div
+            className="flex-1 overflow-hidden rounded-md progress-track"
+            style={{ height: "10px" }}
+          >
+            <motion.div
+              className="h-full progress-bar"
+              style={{ width: `${progress}%` }}
+              transition={{ type: "spring", stiffness: 120, damping: 16 }}
+            />
+          </div>
+          <motion.button
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="paycard-nav paycard-next"
+            onClick={
+              currentStep < questions.length - 1 ? handleNext : handleSwap
+            }
+          >
+            {currentStep < questions.length - 1 ? "Continue" : "Execute Swap"}
+          </motion.button>
+        </div>
+      </div>
+
+      <div
+        className="
+        cursor-glow 
+        fixed z-[60] 
+        pointer-events-none"
+        style={{
+          transform: `translate3d(${cursor.x - 28}px, ${cursor.y - 28}px, 0)`,
+        }}
+      />
     </div>
   );
 }
