@@ -5,6 +5,8 @@ import { Keypair } from '@stellar/stellar-sdk';
 import InterstellarButton from '../components/InterstellarButton';
 import Image from 'next/image';
 import { useStellarAccount } from '../hooks/useStellarAccount';
+import InteractiveBalls from '../components/InteractiveBalls';
+import MagnifyingCursor from '../components/MagnifyingCursor';
 
 interface WalletInfo {
   publicKey: string;
@@ -54,7 +56,7 @@ export default function StarterPackPage() {
         setWallet(prev => prev ? { 
           ...prev, 
           isFunded: true,
-          balance: '10000.0000000' // Friendbot funds with 10,000 XLM
+          balance: '500' // Friendbot funds with 10,000 XLM
         } : null);
       } else {
         console.error('Funding failed:', result.error);
@@ -121,16 +123,19 @@ export default function StarterPackPage() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      <MagnifyingCursor />
+      <InteractiveBalls />
+      
       {/* Image Background */}
       <div className="fixed inset-0 z-0">
         <Image
           src="/13404.jpg"
           alt="Stellar background"
           fill
-          className="object-cover opacity-40"
+          className="object-cover opacity-20" // reduced opacity
           priority
         />
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/70"></div>
       </div>
 
       {/* Content */}
@@ -219,4 +224,4 @@ export default function StarterPackPage() {
       </div>
     </div>
   );
-} 
+}

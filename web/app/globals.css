@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import './styles/animations.css';
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,37 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+html {
+  cursor: none;
+}
+
+/* Add cursor back for touch devices */
+@media (hover: none) {
+  html {
+    cursor: auto;
+  }
+  
+  .magnifying-cursor {
+    display: none;
+  }
+}
+
+/* Add hover states for interactive elements */
+a, button, input, textarea {
+  cursor: none;
+}
+
+* {
+  cursor: none;
+}
+
+/* Add scale effect for text elements */
+p, h1, h2, h3, h4, h5, h6, span, button {
+  transition: transform 0.2s ease-out;
+}
+
+p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, span:hover, button:hover {
+  transform: scale(1.02);
 }

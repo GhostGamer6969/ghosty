@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import InterstellarButton from '../components/InterstellarButton';
+import InteractiveBalls from '../components/InteractiveBalls';
+import { motion } from 'framer-motion';
 
 interface SwapForm {
   ethAddress: string;
@@ -458,105 +460,79 @@ export default function SwapTypeformPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Video Background */}
-      <div className="fixed inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-40"
-        >
-          <source src="/lightspeed_compressed.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black/50"></div>
-      </div>
+    <div className="min-h-screen bg-[#000913] relative overflow-hidden">
+      {/* Interactive Background */}
+      <InteractiveBalls />
+      
+      {/* Glassmorphism Overlay */}
+      <div className="fixed inset-0 backdrop-blur-[100px] pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className={`
-          max-w-4xl w-full bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 max-h-[90vh] overflow-y-auto
-          transition-all duration-1000 ease-out
-          ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-        `}>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 h-screen flex items-center justify-center p-4"
+      >
+        <div className="max-w-4xl w-full bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10
+        shadow-[0_0_50px_-12px] shadow-[#45B7D1]/20">
           {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white/60 font-mono text-sm">
-                Step {currentStep + 1} of {questions.length}
-              </span>
-              <span className="text-white/60 font-mono text-sm">
-                {Math.round(progress)}%
-              </span>
-            </div>
-            <div className="w-full bg-white/10 rounded-full h-2">
-              <div 
-                className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          </div>
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            className="h-1 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-t-3xl"
+          />
 
-          {/* Question */}
-          <div className="text-center">
-            <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-mono">
+          <div className="p-8 space-y-8">
+            {/* Question Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r 
+              from-white to-[#45B7D1] font-['Cyberway'] text-center"
+            >
               {currentQuestion.title}
-            </h1>
-            <p className="text-lg md:text-xl text-white/70 font-mono mb-8">
-              {currentQuestion.subtitle}
-            </p>
+            </motion.h1>
 
             {/* Question Content */}
-            <div className="mb-8">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
               {renderQuestion()}
-            </div>
+            </motion.div>
 
             {/* Navigation */}
-            <div className="flex justify-center items-center space-x-4 mb-4">
+            <div className="flex justify-between items-center pt-8">
               {currentStep > 0 && (
-                <button
+                <motion.button
+                  whileHover={{ x: -5 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleBack}
-                  className="px-6 py-2 text-white/70 hover:text-white transition-colors font-mono text-sm"
+                  className="px-6 py-3 text-[#45B7D1] hover:text-white transition-colors 
+                  font-['Cyberway'] flex items-center gap-2"
                 >
                   ← Back
-                </button>
+                </motion.button>
               )}
 
-              {currentStep < questions.length - 1 ? (
-                <InterstellarButton
-                  onClick={handleNext}
-                  disabled={!hasValidAnswer()}
-                  className="px-8 py-3 text-base"
-                >
-                  Continue
-                </InterstellarButton>
-              ) : (
-                <InterstellarButton
-                  onClick={handleSwap}
-                  disabled={isLoading || !hasValidAnswer()}
-                  loading={isLoading}
-                  loadingText="PROCESSING..."
-                  className="px-8 py-3 text-base"
-                >
-                  Execute Swap
-                </InterstellarButton>
-              )}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={currentStep < questions.length - 1 ? handleNext : handleSwap}
+                className="px-8 py-3 bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] rounded-xl
+                font-['Cyberway'] text-white shadow-lg shadow-[#4ECDC4]/20 
+                hover:shadow-[#4ECDC4]/40 transition-all duration-300"
+              >
+                {currentStep < questions.length - 1 ? 'Continue' : 'Execute Swap'}
+              </motion.button>
             </div>
-
-            {/* Keyboard Hint */}
-            <div className="mb-4 text-center">
-              <p className="text-white/40 font-mono text-xs">
-                Press <kbd className="px-2 py-1 bg-white/10 rounded text-xs">Space</kbd> or <kbd className="px-2 py-1 bg-white/10 rounded text-xs">Enter</kbd> to continue
-              </p>
-            </div>
-
-            {/* Status */}
-            
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
-} 
+}

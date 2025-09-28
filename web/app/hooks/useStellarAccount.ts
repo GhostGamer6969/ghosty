@@ -34,7 +34,6 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
     try {
       const { destination, startingBalance, source, network = 'testnet' } = options;
 
-      // Validate inputs
       if (!destination) {
         throw new Error('Destination account ID is required');
       }
@@ -42,16 +41,7 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
         throw new Error('Starting balance must be greater than 0');
       }
 
-      // For now, we'll use Friendbot for account creation
-      // In production, you would implement the full createAccount operation
-      console.log('Creating account with destination:', destination);
-      console.log('Starting balance:', startingBalance);
-      console.log('Network:', network);
-      
-      // Generate a new keypair for the destination
       const destinationKeypair = Keypair.fromPublicKey(destination);
-      
-      // Use Friendbot for funding (testnet only)
       const response = await fetch(
         `https://friendbot.stellar.org?addr=${encodeURIComponent(destination)}`
       );
@@ -61,8 +51,7 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
       }
 
       const fundingResult = await response.json();
-      console.log('Friendbot funding result:', fundingResult);
-
+      
       return {
         success: true,
         accountId: destination,
@@ -89,9 +78,9 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
       const destinationPublicKey = destinationKeypair.publicKey();
       const destinationSecretKey = destinationKeypair.secret();
 
-      // Use Friendbot to fund the account (testnet only)
       const response = await fetch(
-        `https://friendbot.stellar.org?addr=${encodeURIComponent(destinationPublicKey)}`
+        `https://friendbot.stellar.org?addr=${encodeURIComponent(destinationPublicKey)}`,
+        { method: 'POST' }
       );
 
       if (!response.ok) {
@@ -99,7 +88,6 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
       }
 
       const fundingResult = await response.json();
-      console.log('Friendbot funding result:', fundingResult);
 
       return {
         success: true,
@@ -126,4 +114,4 @@ export const useStellarAccount = (): UseStellarAccountReturn => {
     isLoading,
     error
   };
-}; 
+};

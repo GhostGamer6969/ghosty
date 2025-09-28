@@ -5,15 +5,52 @@ import Link from "next/link";
 
 export default function Navbar() {
   const [isVisible, setIsVisible] = useState(false);
+  const [account, setAccount] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
-    // Fade in after a short delay
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 1000); // 1 second delay
+    }, 1000);
+
+    // Check if MetaMask is already connected
+    checkConnection();
 
     return () => clearTimeout(timer);
   }, []);
+
+  const checkConnection = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setAccount(accounts[0]);
+        }
+      } catch (error) {
+        console.error("Failed to get accounts:", error);
+      }
+    }
+  };
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        setIsConnecting(true);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setAccount(accounts[0]);
+      } catch (error) {
+        console.error("Failed to connect:", error);
+      } finally {
+        setIsConnecting(false);
+      }
+    } else {
+      window.open('https://metamask.io/download/', '_blank');
+    }
+  };
+
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
     <nav
@@ -27,7 +64,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <span className="text-xl font-thin text-white tracking-wider font-mono">
-            INTOSTELLAR
+            GHOSTY
           </span>
         </Link>
 
@@ -49,11 +86,38 @@ export default function Navbar() {
             STARTER PACK
           </Link>
           <Link
-            href="https://github.com/sairammr/intostellar"
+            href="https://github.com/Ghostgamer6969/ghosty"
             className="text-white/80 hover:text-white transition-colors duration-300 text-sm tracking-wide font-mono"
           >
             DOCS
           </Link>
+          
+          {/* MetaMask Connection Button */}
+          <button
+            onClick={connectWallet}
+            disabled={isConnecting}
+            className="px-4 py-2 bg-white/5 backdrop-blur-md rounded-lg font-mono text-sm 
+            tracking-wider transition-all duration-300 border border-white/10 
+            hover:border-white/20 hover:bg-white/10 cursor-crosshair flex items-center gap-2"
+          >
+            {isConnecting ? (
+              "Connecting..."
+            ) : account ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                {formatAddress(account)}
+              </>
+            ) : (
+              <>
+                <img 
+                  src="/metamask.svg" 
+                  alt="MetaMask" 
+                  className="w-4 h-4"
+                />
+                Connect Wallet
+              </>
+            )}
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
